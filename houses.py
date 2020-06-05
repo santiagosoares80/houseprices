@@ -31,14 +31,14 @@ X_test = pd.read_csv("test.csv")
 X.dropna(axis=0, subset=['SalePrice'], inplace=True)
 y = X.SalePrice
 X.drop('SalePrice', axis=1, inplace=True)
-X.drop(['MSSubClass','MSZoning','Street', 'LotShape','LandContour','LandSlope',
-        'RoofStyle','RoofMatl','Exterior1st','Exterior2nd','MasVnrType','Foundation',
-        'Electrical','Functional','GarageYrBlt','Fence','MoSold','YrSold','SaleType',
-        'SaleCondition', 'Condition1', 'Condition2','BldgType','HouseStyle', 'FireplaceQu'], axis=1, inplace=True)
-X_test.drop(['MSSubClass','MSZoning','Street', 'LotShape','LandContour','LandSlope',
-        'RoofStyle','RoofMatl','Exterior1st','Exterior2nd','MasVnrType','Foundation',
-        'Electrical','Functional','GarageYrBlt','Fence','MoSold','YrSold','SaleType',
-        'SaleCondition', 'Condition1', 'Condition2','BldgType','HouseStyle','FireplaceQu'], axis=1, inplace=True)
+# X.drop(['MSSubClass','MSZoning','Street', 'LotShape','LandContour','LandSlope',
+#         'RoofStyle','RoofMatl','Exterior1st','Exterior2nd','MasVnrType','Foundation',
+#         'Electrical','Functional','GarageYrBlt','Fence','MoSold','YrSold','SaleType',
+#         'SaleCondition', 'Condition1', 'Condition2','BldgType','HouseStyle', 'FireplaceQu'], axis=1, inplace=True)
+# X_test.drop(['MSSubClass','MSZoning','Street', 'LotShape','LandContour','LandSlope',
+#         'RoofStyle','RoofMatl','Exterior1st','Exterior2nd','MasVnrType','Foundation',
+#         'Electrical','Functional','GarageYrBlt','Fence','MoSold','YrSold','SaleType',
+#         'SaleCondition', 'Condition1', 'Condition2','BldgType','HouseStyle','FireplaceQu'], axis=1, inplace=True)
 
 # Drop columns with too many NaN
 X.drop(['PoolQC', 'MiscFeature', 'Alley'], axis=1, inplace=True)
