@@ -20,6 +20,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import GridSearchCV
+from sklearn.feature_selection import SelectKBest, f_regression
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.svm import NuSVR
 from xgboost import XGBRegressor
@@ -31,6 +32,7 @@ X_test = pd.read_csv("test.csv")
 X.dropna(axis=0, subset=['SalePrice'], inplace=True)
 y = X.SalePrice
 X.drop('SalePrice', axis=1, inplace=True)
+
 # X.drop(['MSSubClass','MSZoning','Street', 'LotShape','LandContour','LandSlope',
 #         'RoofStyle','RoofMatl','Exterior1st','Exterior2nd','MasVnrType','Foundation',
 #         'Electrical','Functional','GarageYrBlt','Fence','MoSold','YrSold','SaleType',
@@ -41,8 +43,8 @@ X.drop('SalePrice', axis=1, inplace=True)
 #         'SaleCondition', 'Condition1', 'Condition2','BldgType','HouseStyle','FireplaceQu'], axis=1, inplace=True)
 
 # Drop columns with too many NaN
-X.drop(['PoolQC', 'MiscFeature', 'Alley'], axis=1, inplace=True)
-X_test.drop(['PoolQC', 'MiscFeature', 'Alley'], axis=1, inplace=True)
+# X.drop(['PoolQC', 'MiscFeature', 'Alley'], axis=1, inplace=True)
+# X_test.drop(['PoolQC', 'MiscFeature', 'Alley'], axis=1, inplace=True)
 
 # Preprocessing data
 
@@ -52,7 +54,8 @@ categorical_cols = [cname for cname in X.columns if X[cname].dtype == 'object']
 
 numerical_transformer = Pipeline(steps=[
     ('imputer',  SimpleImputer(strategy='constant')),
-    ('normalizer', StandardScaler())
+    ('normalizer', StandardScaler()),
+    ('selector', SelectKBest(f_regression,k=30))
     ])
 
 categorical_transformer = Pipeline(steps=[
@@ -67,35 +70,35 @@ preprocessor = ColumnTransformer(
         ])
 
 # # Linear regression
-linreg_model = LinearRegression()
+# linreg_model = LinearRegression()
 
-linreg_pipeline = Pipeline(steps=[
-    ('preprocessor', preprocessor),
-    ('model', linreg_model)
-    ])
+# linreg_pipeline = Pipeline(steps=[
+#     ('preprocessor', preprocessor),
+#     ('model', linreg_model)
+#     ])
 
-linreg_scores = -1 * cross_val_score(linreg_pipeline, X, y, 
-                        scoring='neg_mean_absolute_error', cv=5, 
-                        n_jobs=-1)
+# linreg_scores = -1 * cross_val_score(linreg_pipeline, X, y, 
+#                         scoring='neg_mean_absolute_error', cv=5, 
+#                         n_jobs=-1)
 
-print("Error for Linear Regression: ", linreg_scores)
-print("Mean error for Linear Regression: ", linreg_scores.mean())
+# print("Error for Linear Regression: ", linreg_scores)
+# print("Mean error for Linear Regression: ", linreg_scores.mean())
 
-# # Random Forest Regression
+# # # Random Forest Regression
 
-rf_model = RandomForestRegressor(random_state=0)
+# rf_model = RandomForestRegressor(random_state=0)
 
-rf_pipeline = Pipeline(steps=[
-    ('preprocessor', preprocessor),
-    ('model', rf_model)
-    ])
+# rf_pipeline = Pipeline(steps=[
+#     ('preprocessor', preprocessor),
+#     ('model', rf_model)
+#     ])
 
-rf_scores = -1 * cross_val_score(rf_pipeline, X, y,
-                                  scoring='neg_mean_absolute_error', cv=5,
-                                  n_jobs=-1)
+# rf_scores = -1 * cross_val_score(rf_pipeline, X, y,
+#                                   scoring='neg_mean_absolute_error', cv=5,
+#                                   n_jobs=-1)
 
-print("Error for Random Forest Regressor: ", rf_scores)
-print("Mean error for Random Forest Regressor: ", rf_scores.mean())
+# print("Error for Random Forest Regressor: ", rf_scores)
+# print("Mean error for Random Forest Regressor: ", rf_scores.mean())
 
 # XGB Regressor
 
@@ -113,21 +116,21 @@ xgbr_scores = -1 * cross_val_score(xgbr_pipeline, X, y,
 print("Error for XGBRegressor: ", xgbr_scores)
 print("Mean error for XGBRegressor: ", xgbr_scores.mean())
 
-# # SVM
+# # # SVM
 
-svm_model = NuSVR()
+# svm_model = NuSVR()
 
-svm_pipeline = Pipeline(steps=[
-    ('preprocessor', preprocessor),
-    ('model', svm_model)
-    ])
+# svm_pipeline = Pipeline(steps=[
+#     ('preprocessor', preprocessor),
+#     ('model', svm_model)
+#     ])
 
-svm_scores = -1 * cross_val_score(svm_pipeline, X, y,
-                                  scoring='neg_mean_absolute_error', cv=5,
-                                  n_jobs=-1)
+# svm_scores = -1 * cross_val_score(svm_pipeline, X, y,
+#                                   scoring='neg_mean_absolute_error', cv=5,
+#                                   n_jobs=-1)
 
-print("Error for SVM: ", svm_scores)
-print("Mean error for SVM: ", svm_scores.mean())
+# print("Error for SVM: ", svm_scores)
+# print("Mean error for SVM: ", svm_scores.mean())
 
 # Analyzing error vs. m (# of training examples)
 
@@ -168,7 +171,7 @@ print("Mean error for SVM: ", svm_scores.mean())
 
 # # Predicting for Kaggle Competition
 
-param_grid = [{'model__learning_rate': [0.04, 0.05, 0.06], 'model__max_depth': [2, 3, 4], 'model__n_estimators': [2000]}]
+param_grid = [{'model__learning_rate': [0.03, 0.04, 0.05], 'model__max_depth': [2], 'model__n_estimators': [2000]}]
 search = GridSearchCV(xgbr_pipeline, param_grid, scoring='neg_mean_absolute_error', cv=5, n_jobs=-1)
 
 search.fit(X,y)
